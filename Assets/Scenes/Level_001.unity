@@ -885,7 +885,7 @@ GameObject:
   - component: {fileID: 671034331}
   m_Layer: 6
   m_Name: Player
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1012,10 +1012,10 @@ MonoBehaviour:
   - {fileID: 487690672}
   - {fileID: 1229541683}
   - {fileID: 591749884}
-  patrolSpeed: 2
-  chaseSpeed: 2
-  detectionRadius: 2
-  loseSightRadius: 2
+  patrolSpeed: 5
+  chaseSpeed: 4
+  detectionRadius: 8
+  loseSightRadius: 8
   stunDuration: 3
 --- !u!1 &832575517
 GameObject:
@@ -2442,6 +2442,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 287237396794793169, guid: 4a5effaa176eb1c41ab92dd9816652ec, type: 3}
+      propertyPath: m_AgentTypeID
+      value: -334000983
+      objectReference: {fileID: 0}
     - target: {fileID: 944495785422857271, guid: 4a5effaa176eb1c41ab92dd9816652ec, type: 3}
       propertyPath: m_LocalPosition.x
       value: 437.05
