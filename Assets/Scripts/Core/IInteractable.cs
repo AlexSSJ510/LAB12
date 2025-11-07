@@ -1,11 +1,9 @@
+using UnityEngine;
 
 /// <summary>
-/// El contrato
+/// Interfaz para objetos que pueden ser interactuados
 /// </summary>
 public interface IInteractable
 {
-    /// <summary>
-    /// La firma requerida
-    /// </summary>
     void Interact();
 }

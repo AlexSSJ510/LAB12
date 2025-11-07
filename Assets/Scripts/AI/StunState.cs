@@ -1,33 +1,73 @@
-using System.Collections;
 using UnityEngine;
-using UnityEngine.AI;
+using System.Collections;
 
 public class StunState : AIState
 {
-    private float _stunDuration;
-
-    public StunState(AIController controller, float stunDuration) : base(controller)
-    {
-        _stunDuration = stunDuration;
-    }
+    public StunState(AIController controller) : base(controller) { }
 
     public override void OnEnter()
     {
-        Debug.Log("Entrando en estado de Aturdimiento.");
-        m_agent.isStopped = true;  // Detener el NavMeshAgent
-        m_controller.StartCoroutine(StunDurationCoroutine());
+        Debug.Log("Entrando en estado: ATURDIDO");
+        
+        // Verificar que el controller no sea null
+        if (controller == null)
+        {
+            Debug.LogError("Controller es null en StunState.OnEnter()");
+            return;
+        }
+
+        if (controller.Agent != null && controller.Agent.isOnNavMesh)
+        {
+            controller.Agent.isStopped = true;
+        }
+        
+        Renderer renderer = controller.GetComponent<Renderer>();
+        if (renderer != null)
+        {
+            renderer.material.color = Color.yellow;
+        }
+        
+        controller.StartCoroutine(StunCoroutine());
     }
 
-    private IEnumerator StunDurationCoroutine()
+    public override void UpdateState()
     {
-        yield return new WaitForSeconds(_stunDuration);  // Esperar la duración del aturdimiento
-        m_controller.ChangeState(new PatrolState(m_controller));  // Regresar al estado de patrullaje
+        // No hace nada mientras estÃ¡ aturdido
     }
-
-    public override void UpdateState() { /* No necesita lógica de actualización mientras está aturdido */ }
 
     public override void OnExit()
     {
-        m_agent.isStopped = false;  // Asegurarse de que el agente pueda moverse después de salir del estado
+        Debug.Log("Saliendo de estado: ATURDIDO");
+        
+        if (controller == null) return;
+        
+        if (controller.Agent != null)
+        {
+            controller.Agent.isStopped = false;
+        }
+        
+        Renderer renderer = controller.GetComponent<Renderer>();
+        if (renderer != null)
+        {
+            renderer.material.color = Color.white;
+        }
+    }
+
+    private IEnumerator StunCoroutine()
+    {
+        if (controller == null)
+        {
+            Debug.LogError("Controller es null en StunCoroutine");
+            yield break;
+        }
+
+        // Esperar la duraciÃ³n del aturdimiento
+        yield return new WaitForSeconds(controller.StunDuration);
+        
+        // Verificar nuevamente que controller exista antes de cambiar estado
+        if (controller != null)
+        {
+            controller.ChangeState(new PatrolState(controller));
+        }
     }
 }

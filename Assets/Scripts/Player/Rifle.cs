@@ -1,53 +1,75 @@
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 public class Rifle : MonoBehaviour
 {
+    [Header("Configuración del Rifle")]
     public float range = 50f;
-    public Key fireKey = Key.F;  // Use 'Key' instead of 'KeyCode' for the new Input System
+    public float fireRate = 0.5f;
+    public KeyCode shootKey = KeyCode.F; // Tecla para disparar (presiona F)
+    
+    private Camera playerCamera;
+    private float nextFireTime = 0f;
 
-    private PlayerInputActions _inputActions;
-
-    private void Awake()
+    private void Start()
     {
-        _inputActions = new PlayerInputActions(); // Make sure you have this class set up for input
-    }
-
-    private void OnEnable()
-    {
-        _inputActions.Player.Enable();
-        _inputActions.Player.Fire.performed += OnFire;  // Listen for the 'Fire' action
-    }
-
-    private void OnDisable()
-    {
-        _inputActions.Player.Fire.performed -= OnFire;
-        _inputActions.Player.Disable();
-    }
-
-    private void OnFire(InputAction.CallbackContext context)
-    {
-        Shoot();
+        playerCamera = Camera.main;
+        
+        if (playerCamera == null)
+        {
+            Debug.LogError("No se encontró la cámara principal. Asegúrate de que la cámara tenga el tag 'MainCamera'.");
+        }
     }
 
     private void Update()
     {
-   
+        // Usar Input.GetKeyDown (sistema antiguo de Unity - siempre funciona)
+        if (Input.GetKeyDown(shootKey) && Time.time >= nextFireTime)
+        {
+            Shoot();
+            nextFireTime = Time.time + fireRate;
+        }
     }
 
     private void Shoot()
     {
-        RaycastHit hit;
-        Ray ray = new Ray(transform.position, transform.forward);
+        if (playerCamera == null) return;
 
-        if (Physics.Raycast(ray, out hit, range))
+        Vector3 rayOrigin = playerCamera.ViewportToWorldPoint(new Vector3(0.5f, 0.5f, 0f));
+        Vector3 rayDirection = playerCamera.transform.forward;
+        
+        RaycastHit hit;
+
+        if (Physics.Raycast(rayOrigin, rayDirection, out hit, range))
         {
+            Debug.Log($"Raycast golpeó: {hit.collider.gameObject.name}");
+
+            // PRIORIDAD 1: Intentar usar IDamageable (sistema avanzado)
+            IDamageable damageable = hit.collider.GetComponent<IDamageable>();
+            if (damageable != null && damageable.IsAlive)
+            {
+                // Aplicar daño de tipo "stun" (10 puntos de daño)
+                damageable.TakeDamage(10f, "stun");
+                Debug.Log($"¡{hit.collider.gameObject.name} dañado! (Sistema IDamageable)");
+                return; // Salir después de aplicar daño
+            }
+
+            // FALLBACK: Usar IInteractable (compatibilidad con versión anterior)
             IInteractable interactable = hit.collider.GetComponent<IInteractable>();
             if (interactable != null)
             {
                 interactable.Interact();
-                Debug.Log("�Enemigo aturdido!");
+                Debug.Log("¡Enemigo aturdido! (Sistema IInteractable)");
+                return;
             }
+
+            Debug.Log("El objeto no es dañable ni interactuable.");
         }
+        else
+        {
+            Debug.Log("El disparo no golpeó nada.");
+        }
+
+        Debug.DrawRay(rayOrigin, rayDirection * range, Color.red, 1f);
     }
+
 }

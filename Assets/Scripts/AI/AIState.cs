@@ -1,25 +1,18 @@
 using UnityEngine;
-using UnityEngine.AI;
-using UnityEngine.InputSystem.XR;
 
 /// <summary>
-/// Clase base abstracta para todos los estados de la IA
+/// Clase base abstracta que define el contrato para todos los estados de IA
 /// </summary>
 public abstract class AIState
 {
-    // Usamos 'protected' para que las clases hijas puedan acceder.
-    // El prefijo 'm_' es una convención común para miembros protegidos.
-    protected AIController m_controller;
-    protected NavMeshAgent m_agent;
-    protected Transform m_playerTransform;
+    protected AIController controller;
 
     public AIState(AIController controller)
     {
-        m_controller = controller;
-        m_agent = controller.GetComponent<NavMeshAgent>();
-        m_playerTransform = GameObject.FindGameObjectWithTag("Player").transform;
+        this.controller = controller;
     }
 
+    // MÃ©todos abstractos que cada estado concreto debe implementar
     public abstract void OnEnter();
     public abstract void UpdateState();
     public abstract void OnExit();

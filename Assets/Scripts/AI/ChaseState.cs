@@ -1,27 +1,61 @@
 using UnityEngine;
 
+/// <summary>
+/// Estado de persecuci√≥n: El enemigo persigue al jugador
+/// </summary>
 public class ChaseState : AIState
 {
     public ChaseState(AIController controller) : base(controller) { }
 
     public override void OnEnter()
     {
-        Debug.Log("Entrando en estado de PersecuciÛn.");
-        m_agent.speed = m_controller.chaseSpeed;
+        Debug.Log("Entrando en estado: PERSECUCI√ìN");
+        controller.Agent.speed = controller.ChaseSpeed;
+        controller.Agent.isStopped = false;
     }
 
     public override void UpdateState()
     {
-        // 1. CondiciÛn de transiciÛn: øhemos perdido al jugador?
-        if (Vector3.Distance(m_controller.transform.position, m_playerTransform.position) > m_controller.loseSightRadius)
+        if (!controller.Agent.isOnNavMesh || !controller.Agent.enabled)
         {
-            m_controller.ChangeState(new PatrolState(m_controller));
             return;
         }
 
-        // 2. LÛgica del estado: perseguir al jugador.
-        m_agent.destination = m_playerTransform.position;
+        if (controller.Player == null)
+        {
+            controller.ChangeState(new PatrolState(controller));
+            return;
+        }
+
+        float distanceToPlayer = Vector3.Distance(
+            controller.transform.position,
+            controller.Player.position
+        );
+
+        // NUEVO: Si est√° muy cerca, cambiar a estado de ataque
+        if (distanceToPlayer <= controller.AttackRange)
+        {
+            controller.ChangeState(new AttackState(controller));
+            return;
+        }
+
+        // Si est√° muy lejos, volver a patrullar
+        if (distanceToPlayer > controller.LoseSightRadius)
+        {
+            controller.ChangeState(new PatrolState(controller));
+            return;
+        }
+
+        // Seguir persiguiendo
+        if (controller.Agent.isOnNavMesh)
+        {
+            controller.Agent.SetDestination(controller.Player.position);
+        }
     }
 
-    public override void OnExit() { }
+
+    public override void OnExit()
+    {
+        Debug.Log("Saliendo de estado: PERSECUCI√ìN");
+    }
 }

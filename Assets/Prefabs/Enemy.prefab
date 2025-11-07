@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 8110130255616680005}
   - component: {fileID: 9047535846313698584}
   - component: {fileID: 287237396794793169}
+  - component: {fileID: 4238541648342563544}
   m_Layer: 0
   m_Name: Enemy
   m_TagString: Untagged
@@ -136,3 +137,29 @@ NavMeshAgent:
   m_BaseOffset: 1
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
+--- !u!114 &4238541648342563544
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1021176064196691961}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9ab511dc9916204d940d778adc2e498, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AIController
+  _waypoints:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  _patrolSpeed: 2
+  _waypointTolerance: 1
+  _chaseSpeed: 5
+  _detectionRadius: 10
+  _loseSightRadius: 15
+  _stunDuration: 3
+  _player: {fileID: 0}
+  _maxHealth: 100
+  _attackRange: 2
+  _attackCooldown: 1.5

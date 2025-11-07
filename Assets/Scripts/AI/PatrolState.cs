@@ -1,40 +1,67 @@
 using UnityEngine;
 
+/// <summary>
+/// Estado de patrullaje: El enemigo sigue una ruta de waypoints
+/// </summary>
 public class PatrolState : AIState
 {
-    public PatrolState(AIController controller) : base(controller) { }
+    private int currentWaypointIndex = 0;
 
-    private int _currentWaypointIndex = 0;
+    public PatrolState(AIController controller) : base(controller) { }
 
     public override void OnEnter()
     {
-        Debug.Log("Entrando en estado de Patrulla.");
-        m_agent.speed = m_controller.patrolSpeed;
-        GoToNextWaypoint();
+        Debug.Log("Entrando en estado: PATRULLA");
+        controller.Agent.speed = controller.PatrolSpeed;
+        controller.Agent.isStopped = false;
+        
+        if (controller.Waypoints.Length > 0)
+        {
+            SetNextWaypoint();
+        }
     }
 
     public override void UpdateState()
     {
-        // 1. Condición de transición: ¿vemos al jugador?
-        if (Vector3.Distance(m_controller.transform.position, m_playerTransform.position) < m_controller.detectionRadius)
+        // Verificar si detectamos al jugador
+        float distanceToPlayer = Vector3.Distance(
+            controller.transform.position, 
+            controller.Player.position
+        );
+
+        if (distanceToPlayer <= controller.DetectionRadius)
         {
-            m_controller.ChangeState(new ChaseState(m_controller));
+            // TransiciÃ³n a persecuciÃ³n
+            controller.ChangeState(new ChaseState(controller));
             return;
         }
 
-        // 2. Lógica del estado: ¿hemos llegado al waypoint?
-        if (!m_agent.pathPending && m_agent.remainingDistance < 0.5f)
+        // LÃ³gica de patrulla
+        if (controller.Waypoints.Length == 0) return;
+
+        // Verificar si llegamos al waypoint actual
+        float distanceToWaypoint = Vector3.Distance(
+            controller.transform.position,
+            controller.Waypoints[currentWaypointIndex].position
+        );
+
+        if (distanceToWaypoint <= controller.WaypointTolerance)
         {
-            GoToNextWaypoint();
+            // Avanzar al siguiente waypoint
+            currentWaypointIndex = (currentWaypointIndex + 1) % controller.Waypoints.Length;
+            SetNextWaypoint();
         }
     }
 
-    public override void OnExit() { /* No necesita lógica por ahora */ }
-
-    private void GoToNextWaypoint()
+    public override void OnExit()
     {
-        if (m_controller.waypoints.Length == 0) return;
-        m_agent.destination = m_controller.waypoints[_currentWaypointIndex].position;
-        _currentWaypointIndex = (_currentWaypointIndex + 1) % m_controller.waypoints.Length;
+        Debug.Log("Saliendo de estado: PATRULLA");
+    }
+
+    private void SetNextWaypoint()
+    {
+        controller.Agent.SetDestination(
+            controller.Waypoints[currentWaypointIndex].position
+        );
     }
 }
