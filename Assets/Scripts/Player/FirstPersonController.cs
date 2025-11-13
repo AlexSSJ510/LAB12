@@ -14,7 +14,7 @@ public class FirstPersonController : MonoBehaviour
     [SerializeField] private Transform _cameraTransform;
 
     private CharacterController _characterController;
-    private PlayerInputActions _inputActions;
+    private InputSystem_Actions _inputActions;
 
     private Vector2 _moveInput;
     private Vector2 _lookInput;
@@ -35,7 +35,7 @@ public class FirstPersonController : MonoBehaviour
             return;
         }
 
-        _inputActions = new PlayerInputActions();
+        _inputActions = new InputSystem_Actions();
     }
 
     void Start()

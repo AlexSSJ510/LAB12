@@ -17,13 +17,13 @@ public class PlayerInteractor : MonoBehaviour
     [SerializeField] private UnityEvent<GameObject> _onTargetLost;
 
     private Camera _mainCamera;
-    private PlayerInputActions _inputActions;
+    private InputSystem_Actions _inputActions;
     private GameObject _current;
 
     private void Awake()
     {
         _mainCamera = Camera.main;
-        _inputActions = new PlayerInputActions();
+        _inputActions = new InputSystem_Actions();
     }
 
     private void OnEnable()
