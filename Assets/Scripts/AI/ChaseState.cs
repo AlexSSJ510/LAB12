@@ -32,7 +32,7 @@ public class ChaseState : AIState
             controller.Player.position
         );
 
-        // NUEVO: Si está muy cerca, cambiar a estado de ataque
+        // Si está muy cerca, cambiar a estado de ataque
         if (distanceToPlayer <= controller.AttackRange)
         {
             controller.ChangeState(new AttackState(controller));
@@ -46,13 +46,15 @@ public class ChaseState : AIState
             return;
         }
 
-        // Seguir persiguiendo
+        // ==========================
+        // VERSIÓN OPTIMIZADA (final)
+        // ==========================
         if (controller.Agent.isOnNavMesh)
         {
+            // Usamos la referencia cacheada al jugador, sin búsquedas caras.
             controller.Agent.SetDestination(controller.Player.position);
         }
     }
-
 
     public override void OnExit()
     {
