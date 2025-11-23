@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.UI;
 
 public class AIController : MonoBehaviour, IInteractable, IDamageable
 {
@@ -25,6 +26,9 @@ public class AIController : MonoBehaviour, IInteractable, IDamageable
     [Header("Configuración de Ataque")]
     [SerializeField] private float _attackRange = 2f; // Distancia para atacar
     [SerializeField] private float _attackCooldown = 1.5f; // Tiempo entre ataques
+
+    [Header("UI de Salud")]
+    [SerializeField] private Slider _healthSlider;
 
     // Propiedades públicas
     public float AttackRange => _attackRange;
@@ -82,6 +86,12 @@ public class AIController : MonoBehaviour, IInteractable, IDamageable
         // AÑADIR al principio del método Start()
         _currentHealth = _maxHealth;
 
+        if (_healthSlider != null)
+        {
+            _healthSlider.maxValue = _maxHealth;
+            _healthSlider.value = _currentHealth;
+        }
+
         if (agent == null || _player == null)
         {
             Debug.LogError("Configuración incompleta.");
@@ -135,7 +145,12 @@ public class AIController : MonoBehaviour, IInteractable, IDamageable
         // Reducir la salud
         _currentHealth -= amount;
         Debug.Log($"{gameObject.name} recibió {amount} de daño tipo '{damageType}'. Salud restante: {_currentHealth}/{_maxHealth}");
-        
+
+        if (_healthSlider != null)
+        {
+            _healthSlider.value = _currentHealth;
+        }
+
         // Comportamiento según el tipo de daño
         switch (damageType.ToLower())
         {
